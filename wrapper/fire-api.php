@@ -570,7 +570,6 @@ Public License instead of this License.  But first, please read
   /***************************************************
   **                     METHODS                    **
   ***************************************************/
-
   /**
    * Constant utils class.
    *
@@ -604,8 +603,35 @@ Public License instead of this License.  But first, please read
 
       return $result;
     }
-  }
 
+    /**
+  	 * Get the X coordinate of the vertex of a second degree polynomial graphical parabola representation (-b divided by 2a with a ≠ 0).
+  	 *
+  	 * @param a x² coefficient of the second degree polynomial
+  	 * @param b x coefficient of the second degree polynomial
+  	 */
+  	public function secondDegreePolynomialParabolaVertexGetX($a, $b) {
+  		return -$b / (2 * $a);
+    }
+
+    /**
+  	 * Get the forbidden value of an homographic function (-d divided by c with c ≠ 0).
+  	 * This value will define the set of definitions of the homographic function on R \ {@link HomographicForbiddenValue(Decimal, Decimal)}.
+  	 *
+  	 * @param c
+  	 * @param d
+  	 */
+  	public function homographicForbiddenValue($c, $d) {
+  		return -$d / $c;
+    }
+  }
+  /***************************************************
+  **               PHYSICS & CHEMISTRY              **
+  ***************************************************/
+  $avogadro = 6.022140857 * pow(10, 23);
+
+
+  // Fire-API main stuff
   /**
    * Definitely best class ever.
    *
