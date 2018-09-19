@@ -554,13 +554,41 @@ Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 -->
 <?php
+  // REMOVE WHEN MAINTENANCE IS DISABLED
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
+
+  // Global variables declaration
+  global $API_version;
+  global $champernowne;
+  global $c10;
+  global $gold_number;
+  global $god_number;
+  global $god_section;
+  global $avogadro;
+  global $boltzmann;
+  global $kB;
+  global $C;
+  global $light_speed;
+  global $earth_gravitational_force;
+  global $elementary_charge;
+  global $faraday;
+  global $G;
+  global $gravitational_constant;
+  global $perfect_gasses;
+  global $planck;
+  global $electron_mass;
+  global $neutron_mass;
+  global $proton_mass;
+
+
   // Constants
   /***************************************************
   **                    FIRE-API                    **
   ***************************************************/
-  $API_InformationsFile = "https://api.fire-softwares.ga/api.json";
-  $API_Version = "1.0";
-  $API_ApplicationName = "";
+  $API_informations_file = "https://api.fire-softwares.ga/api.json";
+  $API_version = "1.0";
   /***************************************************
   **                      MATH                      **
   ***************************************************/
@@ -587,7 +615,7 @@ Public License instead of this License.  But first, please read
     /**
      * Calculate Euler.
      *
-     * @param iterations Number of iterations
+     * @param $iterations Number of iterations
      */
     public function calculateEuler($iterations) {
       $result = $f = 1;
@@ -607,8 +635,8 @@ Public License instead of this License.  But first, please read
     /**
   	 * Get the X coordinate of the vertex of a second degree polynomial graphical parabola representation (-b divided by 2a with a ≠ 0).
   	 *
-  	 * @param a x² coefficient of the second degree polynomial
-  	 * @param b x coefficient of the second degree polynomial
+  	 * @param $a x² coefficient of the second degree polynomial
+  	 * @param $b x coefficient of the second degree polynomial
   	 */
   	public function secondDegreePolynomialParabolaVertexGetX($a, $b) {
   		return -$b / (2 * $a);
@@ -618,8 +646,8 @@ Public License instead of this License.  But first, please read
   	 * Get the forbidden value of an homographic function (-d divided by c with c ≠ 0).
   	 * This value will define the set of definitions of the homographic function on R \ {@link HomographicForbiddenValue(Decimal, Decimal)}.
   	 *
-  	 * @param c
-  	 * @param d
+  	 * @param $c
+  	 * @param $d
   	 */
   	public function homographicForbiddenValue($c, $d) {
   		return -$d / $c;
@@ -628,8 +656,62 @@ Public License instead of this License.  But first, please read
   /***************************************************
   **               PHYSICS & CHEMISTRY              **
   ***************************************************/
+  // Constants
+	/**
+	 * Avogadro's constant (unit/mol).
+	 */
   $avogadro = 6.022140857 * pow(10, 23);
+	/**
+	 * Boltzmann constant (J/K).
+	 */
+  $boltzmann = $kB = 1.38066 * pow(10, -23);
+	/**
+	 * Light speed constant (m/s).
+	 */
+	$C = $light_speed = 2.99792458 * pow(10, 8);
+	/**
+	 * Gravitational force on Earth.
+	 */
+	$earth_gravitational_force = 9.80665;
+	/**
+	 * Elementary charge constant.
+	 */
+	$elementary_charge = 1.60219 * pow(10, -19);
+	/**
+	 * Faraday's constant (C/mol).
+	 */
+	$faraday = 96484;
+	/**
+	 * Gravitational constant (N × m² × kg-²).
+	 */
+	$G = $gravitational_constant = 6.672 * pow(10, -11);
+	/**
+	 * Perfect gasses constant (J/(K/mol)).
+	 */
+	$perfect_gasses = 8.3144;
+	/**
+	 * Planck's constant (J × s)
+	 */
+  $planck = 6.62617;
+	// Masses
+	/**
+	 * Mass of an electron (kg)
+	 */
+	$electron_mass = 9.10953 * pow(10, -31);
+	/**
+	 * Mass of a neutron (kg)
+	 */
+	$neutron_mass = 1.675 * pow(10, -27);
+	/**
+	 * Mass of a proton (kg)
+	 */
+  $proton_mass = 1.673 * pow(10, -27);
 
+  // Update utility
+  $json = json_decode(file_get_contents($API_informations_file), true);
+  if (!($json['informations']['version'] == $API_version)) {
+    error_log("[Fire-API] Fire-API isn't up to date !\nLast version is " . $json['informations']['version'] . ".\n", 3);
+  }
 
   // Fire-API main stuff
   /**
@@ -639,7 +721,21 @@ Public License instead of this License.  But first, please read
    * @since 1.0
    */
   class Fire_API_ref {
+    /**
+  	 * Return a specified information of the server.
+  	 * @param $server_info_type
+  	 */
+    public function getServerInformation($server_info_type) {
+      switch ($server_info_type) {
+        case 'cpu0':
+          return json_decode(file_get_contents($API_informations_file), true)['status']['cpu'][0]; // TODO: TEST
+          break;
 
+        default:
+          // code...
+          break;
+      }
+    }
   }
 
   class FireAuth {
