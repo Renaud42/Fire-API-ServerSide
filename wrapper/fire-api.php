@@ -581,7 +581,13 @@ Public License instead of this License.  But first, please read
   global $electron_mass;
   global $neutron_mass;
   global $proton_mass;
-
+  global $fireradio_base_URL;
+  global $json_fireradio_playlist;
+  global $json_fireradio_last_added_track;
+  global $json_fireradio_last_removed_track;
+  global $json_fireradio_stats;
+  global $json_mumble;
+  global $json_vps;
 
   // Constants
   /***************************************************
@@ -589,6 +595,13 @@ Public License instead of this License.  But first, please read
   ***************************************************/
   $API_informations_file = "https://api.fire-softwares.ga/api.json";
   $API_version = "1.0";
+  $fireradio_base_URL = "https://api.fire-softwares.ga/fire-radio/";
+  $json_fireradio_playlist = $fireradio_base_URL . "?action=playlist";
+  $json_fireradio_last_added_track = $fireradio_base_URL . "lastadded.json";
+  $json_fireradio_last_removed_track = $fireradio_base_URL . "lastremoved.json";
+  $json_fireradio_stats = $fireradio_base_URL . "stats.json";
+  $json_mumble = "https://panel.omgserv.com/json/180774/status";
+  $json_vps = "https://panel.omgserv.com/json/180278/status";
   /***************************************************
   **                      MATH                      **
   ***************************************************/
@@ -726,13 +739,58 @@ Public License instead of this License.  But first, please read
   	 * @param $server_info_type
   	 */
     public function getServerInformation($server_info_type) {
+      $json_vps = "https://panel.omgserv.com/json/180278/status";
+      $json_mumble = "https://panel.omgserv.com/json/180774/status";
+
       switch ($server_info_type) {
         case 'cpu0':
-          return json_decode(file_get_contents($API_informations_file), true)['status']['cpu'][0]; // TODO: TEST
+          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][0];
+          break;
+        case 'cpu1':
+          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][1];
+          break;
+        case 'cpu2':
+          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][2];
+          break;
+        case 'disk_max':
+          return json_decode(file_get_contents($json_vps), true)['status']['disk']['total'];
+          break;
+        case 'disk_percent':
+          return json_decode(file_get_contents($json_vps), true)['status']['disk']['percent'];
+          break;
+        case 'disk_unit':
+          return json_decode(file_get_contents($json_vps), true)['status']['units']['disk'];
+          break;
+        case 'disk_used':
+          return json_decode(file_get_contents($json_vps), true)['status']['disk']['used'];
+          break;
+        case 'hostname':
+          return json_decode(file_get_contents($json_vps), true)['status']['hostname'];
+          break;
+        case 'mumble_online':
+          return json_decode(file_get_contents($json_mumble), true)['status']['online'];
+          break;
+        case 'mumble_online_players':
+          return json_decode(file_get_contents($json_mumble), true)['status']['players']['online'];
+          break;
+        case 'ram_max'
+          return json_decode(file_get_contents($json_vps), true)['status']['ram']['total'];
+          break;
+        case 'ram_percent':
+          return json_decode(file_get_contents($json_vps), true)['status']['ram']['percent'];
+          break;
+        case 'ram_unit':
+          return json_decode(file_get_contents($json_vps), true)['status']['units']['ram'];
+          break;
+        case 'ram_used':
+          return json_decode(file_get_contents($json_vps), true)['status']['ram']['used'];
+          break;
+        case 'server_online':
+          return json_decode(file_get_contents($json_vps), true)['status']['online'];
           break;
 
         default:
-          // code...
+          die('<b>Fire-API Error : </b>Unknown server info type.<br>See Fire-API documentation for more help.');
           break;
       }
     }
