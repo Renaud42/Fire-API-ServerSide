@@ -876,12 +876,26 @@ Public License instead of this License.  But first, please read
 
   // Fire-Auth requests
   /**
-   * Fire-Auth stuff
+   * "Login with Fire-Auth" stuff
    *
    * @author Renaud42
    * @since 1.0
    */
   class FireAuth {
-    
+    /**
+   	 * Detect server operating system.
+     * @param $redirect_url
+   	 */
+    public function getFireAuthLink($redirect_url, $username, $mail, $registerdate, $role, $firecoins, $lastname, $name, $birthday) {
+      if(!(is_int($username) && is_int($mail) && is_int($registerdate) && is_int($role) && is_int($firecoins) && is_int($lastname) && is_int($name) && is_int($birthday))) {
+        die('A parameter isn\'t correctly defined. Please only use 0 & 1 ints.');
+      }
+
+      try {
+        return 'https://api.fire-softwares.ga/login?redirect=' . $redirect_url . '&access=' . $username . $mail . $registerdate . $role . $firecoins . $lastname . $name . $birthday;
+      } catch (Exception $e) {
+        die('A parameter isn\'t correctly defined. Please only use 0 & 1 ints.\n' . 'More informations : ' . $e);
+      }
+    }
   }
 ?>
