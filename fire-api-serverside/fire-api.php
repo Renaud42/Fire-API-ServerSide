@@ -49,7 +49,7 @@
   products.  If such problems arise substantially in other domains, we
   stand ready to extend this provision to those domains in future versions
   of the GPL, as needed to protect the freedom of users.
-    Finally, every program is threatened constantly by software patents.
+   ly, every program is threatened constantly by software patents.
   States should not allow patents to restrict development and use of
   software on general-purpose computers, but in those that do, we wish to
   avoid the special danger that patents applied to a free program could
@@ -342,7 +342,7 @@
     However, if you cease all violation of this License, then your
   license from a particular copyright holder is reinstated (a)
   provisionally, unless and until the copyright holder explicitly and
-  finally terminates your license, and (b) permanently, if the copyright
+ ly terminates your license, and (b) permanently, if the copyright
   holder fails to notify you of the violation by some reasonable means
   prior to 60 days after the cessation.
     Moreover, your license from a particular copyright holder is
@@ -554,257 +554,564 @@
   Public License instead of this License.  But first, please read
   <http://www.gnu.org/philosophy/why-not-lgpl.html>.
   */
-  
-  // REMOVE WHEN MAINTENANCE IS DISABLED
-  // ini_set('display_errors', 1);
-  // ini_set('display_startup_errors', 1);
-  // error_reporting(E_ALL);
-
-  // Global variables declaration
-  global $API_version;
-  global $champernowne;
-  global $c10;
-  global $gold_number;
-  global $god_number;
-  global $god_section;
-  global $avogadro;
-  global $boltzmann;
-  global $kB;
-  global $C;
-  global $light_speed;
-  global $earth_gravitational_force;
-  global $elementary_charge;
-  global $faraday;
-  global $G;
-  global $gravitational_constant;
-  global $perfect_gasses;
-  global $planck;
-  global $electron_mass;
-  global $neutron_mass;
-  global $proton_mass;
-  global $fireradio_base_URL;
-  global $json_fireradio_playlist;
-  global $json_fireradio_last_added_track;
-  global $json_fireradio_last_removed_track;
-  global $json_fireradio_stats;
-  global $json_mumble;
-  global $json_vps;
-
-  // Constants
-  /***************************************************
-  **                    FIRE-API                    **
-  ***************************************************/
-  $API_informations_file = "https://api.fire-softwares.ga/api.json";
-  $API_version = "1.0";
-  $fireradio_base_URL = "https://api.fire-softwares.ga/fire-radio/";
-  $json_fireradio_playlist = $fireradio_base_URL . "?action=playlist";
-  $json_fireradio_last_added_track = $fireradio_base_URL . "lastadded.json";
-  $json_fireradio_last_removed_track = $fireradio_base_URL . "lastremoved.json";
-  $json_fireradio_stats = $fireradio_base_URL . "stats.json";
-  $json_mumble = "https://panel.omgserv.com/json/180774/status";
-  $json_vps = "https://panel.omgserv.com/json/180278/status";
-  $user_agent = $_SERVER['HTTP_USER_AGENT'];
-  /***************************************************
-  **                      MATH                      **
-  ***************************************************/
-  $champernowne = $c10 = 0.1234567891011;
-  $gold_number = (1 + sqrt(5)) / 2;
-  $god_number = $god_section = 1 + sqrt(5);
-  /***************************************************
-  **                     METHODS                    **
-  ***************************************************/
   /**
-   * Constant utils class.
+   * Fire-API is a wrapper for Fire-Softwares API and a library of cool things
    *
-   * @author Renaud42
+   * Requirement : PHP 7.0+
+   *
+   * @category API-wrapper/library
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
    * @since 1.0
    */
-  class Constants {
-    /**
-  	 * Calculate π.
-  	 */
-    public function getPi() {
-      return 4 * atan(1); // Calculate the value of pi.
-    }
 
+   /**
+    * Definitively best class ever.
+    *
+    * @category Main class
+    * @package None
+    * @author Renaud <renaud42@fire-softwares.ga>
+    * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+    * @license https://www.gnu.org/licenses/gpl-3.0.html
+    * @link https://api.fire-softwares.ga
+    * @version 1.1
+    * @since 1.0
+    */
+  class Fire_API {
     /**
-     * Calculate Euler.
+     * Current version of your API
+     * @var string
+     */
+    public static $API_VERSION = "1.1";
+    /**
+     * Fire-API update page URL
      *
-     * @param $iterations Number of iterations
+     * @var string
      */
-    public function calculateEuler($iterations) {
-      $result = $f = 1;
+    private $API_UPDATE_PAGE = "https://api.fire-softwares.ga/?page=download";
 
-      for ($i = 1; $i <= $iterations; ++$i) {
-        $f *= doubleval(1 / $i);
+    /**
+     * Updates check method
+     */
+    function updatesCheck() {
+      $updater = new API;
 
-        if ($f == 0)
-          break;
-
-        $result += $f;
+      try {
+        if ($updater->getServerInformation(ServerName::$FIRE_SOFTWARES, ServerInfoType::$ONLINE) === TRUE) {
+          $lastversion = $updater->getServerInformation(ServerName::$API_STATUS, ServerInfoType::$VERSION);
+          if (doubleval($lastversion) > doubleval($API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $API_UPDATE_PAGE, str_replace("%new-version%", $lastversion, Messages::$API_UPDATE_AVAILABLE)), 'warn');
+          elseif (doubleval($lastversion) < doubleval($API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $API_UPDATE_PAGE, str_replace("%lastest-stable%", $lastversion, str_replace("%api-version%", $API_VERSION, Messages::$API_BETA))), 'warn');
+          else $this->console_log(Messages::$API_PREFIX . " " . str_replace("%api-version%", $API_VERSION, Messages::$API_UP_TO_DATE));
+        }
+      } catch (Exception $e) {
+        $this->console_log(Messages::$API_ERROR_PREFIX . " " . Messages::$UPDATE_CHECK_EXCEPTION, 'error');
+        $this->console_log(Messages::$API_ERROR_PREFIX . " " . $e->getMessage(), 'error');
       }
 
-      return $result;
+      $this->console_log("\n\r" . Messages::$API_PREFIX . " " . str_replace("%api-version%", $API_VERSION, Messages::$API_HELLO));
+    }
+
+    // Constructor
+    function __construct() {
+      $this->updatesCheck();
     }
 
     /**
-  	 * Get the X coordinate of the vertex of a second degree polynomial graphical parabola representation (-b divided by 2a with a ≠ 0).
-  	 *
-  	 * @param $a x² coefficient of the second degree polynomial
-  	 * @param $b x coefficient of the second degree polynomial
-  	 */
-  	public function secondDegreePolynomialParabolaVertexGetX($a, $b) {
-  		return -$b / (2 * $a);
-    }
-
-    /**
-  	 * Get the forbidden value of an homographic function (-d divided by c with c ≠ 0).
-  	 * This value will define the set of definitions of the homographic function on R \ {@link HomographicForbiddenValue(Decimal, Decimal)}.
-  	 *
-  	 * @param $c
-  	 * @param $d
-  	 */
-  	public function homographicForbiddenValue($c, $d) {
-  		return -$d / $c;
+     * Function to log into JavaScript console
+     */
+    function console_log($output, $command = 'log', $with_script_tags = true) {
+        $js_code = 'console.' . $command . '(' . json_encode($output, JSON_HEX_TAG) . ');';
+        if ($with_script_tags) $js_code = '<script>' . $js_code . '</script>';
+        echo $js_code;
     }
   }
-  /***************************************************
-  **               PHYSICS & CHEMISTRY              **
-  ***************************************************/
-  // Constants
-	/**
-	 * Avogadro's constant (unit/mol).
-	 */
-  $avogadro = 6.022140857 * pow(10, 23);
-	/**
-	 * Boltzmann constant (J/K).
-	 */
-  $boltzmann = $kB = 1.38066 * pow(10, -23);
-	/**
-	 * Light speed constant (m/s).
-	 */
-	$C = $light_speed = 2.99792458 * pow(10, 8);
-	/**
-	 * Gravitational force on Earth.
-	 */
-	$earth_gravitational_force = 9.80665;
-	/**
-	 * Elementary charge constant.
-	 */
-	$elementary_charge = 1.60219 * pow(10, -19);
-	/**
-	 * Faraday's constant (C/mol).
-	 */
-	$faraday = 96484;
-	/**
-	 * Gravitational constant (N × m² × kg-²).
-	 */
-	$G = $gravitational_constant = 6.672 * pow(10, -11);
-	/**
-	 * Perfect gasses constant (J/(K/mol)).
-	 */
-	$perfect_gasses = 8.3144;
-	/**
-	 * Planck's constant (J × s)
-	 */
-  $planck = 6.62617;
-	// Masses
-	/**
-	 * Mass of an electron (kg)
-	 */
-	$electron_mass = 9.10953 * pow(10, -31);
-	/**
-	 * Mass of a neutron (kg)
-	 */
-	$neutron_mass = 1.675 * pow(10, -27);
-	/**
-	 * Mass of a proton (kg)
-	 */
-  $proton_mass = 1.673 * pow(10, -27);
 
-  // Update utility
-  $json = json_decode(file_get_contents($API_informations_file), true);
-  if (!($json['informations']['version'] == $API_version)) {
-    error_log("[Fire-API] Fire-API isn't up to date !\nLast version is " . $json['informations']['version'] . ".\n", 3);
-  }
-
-  // Fire-API main stuff
+  // -------------------------------------------
+  //                   MESSAGES
+  // -------------------------------------------
   /**
-   * Definitely best class ever.
+   * All Fire-API messages
    *
-   * @author Renaud42
+   * @category Constants
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class Messages {
+    // Exceptions
+    /**
+     * Message returned when can't check for updates
+     */
+    public static $UPDATE_CHECK_EXCEPTION = "Can't check for updates :";
+
+    // Prefixes
+    /**
+     * Fire-API logs regular prefix
+     *
+     * @var string
+     */
+    public static $API_PREFIX = "[Fire-API]";
+    /**
+     * Fire-API logs error prefix
+     *
+     * @var string
+     */
+    public static $API_ERROR_PREFIX = "[Fire-API Error]";
+    /**
+     * Fire-API logs warning prefix
+     *
+     * @var string
+     */
+    public static $API_WARNING_PREFIX = "[Fire-API Warning]";
+
+    // Success
+    /**
+     * Message shown when Fire-API is successfully loaded with main class initilization
+     *
+     * @var string
+     */
+    public static $API_HELLO = "Fire-API version %api-version% by Fire-Softwares successfully loaded !";
+    /**
+     * Message shown when your Fire-API version is the lastest stable
+     *
+     * @var string
+     */
+    public static $API_UP_TO_DATE = "You're running the lastest version of Fire-API (%api-version%), nice !";
+
+    // Warnings
+    /**
+     * Message shown when a Fire-API Beta is used
+     *
+     * @var string
+     */
+    public static $API_BETA = "Warning : you are using a beta / unstable build of Fire-API (%api-version%). If you don't know why you see this warning, go back to lastest stable version (%lastest-stable%) on %api-update-page%. Or else you're in the future of Fire-API 8)";
+    /**
+     * Message shown when a Fire-API update is available
+     *
+     * @var string
+     */
+    public static $API_UPDATE_AVAILABLE = "New update available : Fire-API version %new-version%. You can get the update here : %api-update-page%";
+  }
+
+  // -------------------------------------------
+  //                 API WRAPPER
+  // -------------------------------------------
+  /**
+   * Server names
+   *
+   * @category Enums
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class ServerName {
+    // Values of enum
+    public static $FIRE_SOFTWARES = 0;
+    public static $FIRE_NETWORK = 1;
+    public static $MUMBLE = 2;
+    public static $MUMBLE_CVP = 996;
+    public static $DISCORD = 997;
+    public static $FRAMEWORK_STATUS = 998;
+    public static $API_STATUS = 999;
+  }
+  /**
+   * Type of server info required
+   *
+   * @category Enums
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class ServerInfoType {
+    // Values of enum
+    public static $CHANNELS = 0;
+    public static $CPU_LOAD_0 = 1;
+    public static $CPU_LOAD_1 = 2;
+    public static $CPU_LOAD_2 = 3;
+    public static $DISCORD_ID = 4;
+    public static $DISK_MAX = 5;
+    public static $DISK_PERCENT = 6;
+    public static $DISK_UNIT = 7;
+    public static $DISK_USED = 8;
+    public static $HOSTNAME = 9;
+    public static $MEMBERS = 10;
+    public static $MEMBERS_ONLINE = 11;
+    public static $MUMBLE_X_CONNECT_URL = 12;
+    public static $ONLINE = 13;
+    public static $PLAYER_COUNT = 14;
+    public static $RAM_MAX = 15;
+    public static $RAM_PERCENT = 16;
+    public static $RAM_UNIT = 17;
+    public static $RAM_USED = 18;
+    public static $SERVER_NAME = 19;
+    public static $SERVER_STATUS = 20;
+    public static $UPTIME = 21;
+    public static $VERSION = 22;
+  }
+  /**
+   * Make requests to Fire-API and get response with this class.
+   *
+   * @category Constants
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
    * @since 1.0
    */
-  class Fire_API_ref {
+  class API {
     /**
-  	 * Return a specified information of the server.
-  	 * @param $server_info_type
-  	 */
-    public function getServerInformation($server_info_type) {
-      $json_vps = "https://panel.omgserv.com/json/180278/status";
-      $json_mumble = "https://panel.omgserv.com/json/180774/status";
-
-      switch ($server_info_type) {
-        case 'cpu0':
-          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][0];
-          break;
-        case 'cpu1':
-          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][1];
-          break;
-        case 'cpu2':
-          return json_decode(file_get_contents($json_vps), true)['status']['cpu'][2];
-          break;
-        case 'disk_max':
-          return json_decode(file_get_contents($json_vps), true)['status']['disk']['total'];
-          break;
-        case 'disk_percent':
-          return json_decode(file_get_contents($json_vps), true)['status']['disk']['percent'];
-          break;
-        case 'disk_unit':
-          return json_decode(file_get_contents($json_vps), true)['status']['units']['disk'];
-          break;
-        case 'disk_used':
-          return json_decode(file_get_contents($json_vps), true)['status']['disk']['used'];
-          break;
-        case 'hostname':
-          return json_decode(file_get_contents($json_vps), true)['status']['hostname'];
-          break;
-        case 'mumble_online':
-          return json_decode(file_get_contents($json_mumble), true)['status']['online'];
-          break;
-        case 'mumble_online_players':
-          return json_decode(file_get_contents($json_mumble), true)['status']['players']['online'];
-          break;
-        case 'ram_max':
-          return json_decode(file_get_contents($json_vps), true)['status']['ram']['total'];
-          break;
-        case 'ram_percent':
-          return json_decode(file_get_contents($json_vps), true)['status']['ram']['percent'];
-          break;
-        case 'ram_unit':
-          return json_decode(file_get_contents($json_vps), true)['status']['units']['ram'];
-          break;
-        case 'ram_used':
-          return json_decode(file_get_contents($json_vps), true)['status']['ram']['used'];
-          break;
-        case 'server_online':
-          return json_decode(file_get_contents($json_vps), true)['status']['online'];
-          break;
-
-        default:
-          die('<b>Fire-API Error : </b>Unknown server info type.<br>See Fire-API documentation for more help.');
-          break;
+     * Get status URL corresponding to a server name
+     *
+     * @param int $server_name Corresponding @see ServerName
+     * @return string Status server URL
+     */
+    private function getServerStatusURL($server_name) {
+      // Getting link for corresponding server name
+      switch ($server_name) {
+        case ServerName::$FIRE_SOFTWARES:
+          return Server::$STATUS_0;
+        case ServerName::$FIRE_NETWORK:
+          return Server::$STATUS_1;
+        case ServerName::$MUMBLE:
+          return Server::$STATUS_2;
+        case ServerName::$MUMBLE_CVP:
+          return Server::$STATUS_MUMBLE_CVP;
+        case ServerName::$DISCORD:
+          return Server::$STATUS_DISCORD;
+        case ServerName::$FRAMEWORK_STATUS:
+          return Server::$STATUS_FRAMEWORK;
+        case ServerName::$API_STATUS:
+          return Server::$STATUS_API;
       }
     }
 
     /**
-     * Detect client browser.
+  	 * Returns a specified information of the specified server
+     *
+     * @param int $server_name Corresponding @see ServerName
+  	 * @param int $server_info_type Corresponding @see ServerInfoType
+     * @return object Information needed
+  	 */
+    public function getServerInformation($server_name, $server_info_type) {
+      // Setting link for corresponding server name
+      $link = $this->getServerStatusURL($server_name);
+
+      switch ($server_name) {
+        case ServerName::$FIRE_SOFTWARES:
+        case ServerName::$FIRE_NETWORK:
+          switch ($server_info_type) {
+            case ServerInfoType::$CPU_LOAD_0:
+              return json_decode(file_get_contents($link), true)['status']['cpu'][0];
+            case ServerInfoType::$CPU_LOAD_1:
+              return json_decode(file_get_contents($link), true)['status']['cpu'][1];
+            case ServerInfoType::$CPU_LOAD_2:
+              return json_decode(file_get_contents($link), true)['status']['cpu'][2];
+            case ServerInfoType::$DISK_MAX:
+              return json_decode(file_get_contents($link), true)['status']['disk']['total'];
+            case ServerInfoType::$DISK_PERCENT:
+              return json_decode(file_get_contents($link), true)['status']['disk']['percent'];
+            case ServerInfoType::$DISK_UNIT:
+              return json_decode(file_get_contents($link), true)['status']['units']['disk'];
+            case ServerInfoType::$DISK_USED:
+              return json_decode(file_get_contents($link), true)['status']['disk']['used'];
+            case ServerInfoType::$HOSTNAME:
+              return json_decode(file_get_contents($link), true)['status']['hostname'];
+            case ServerInfoType::$ONLINE:
+              return json_decode(file_get_contents($link), true)['status']['online'];
+            case ServerInfoType::$RAM_MAX:
+              return json_decode(file_get_contents($link), true)['status']['ram']['total'];
+            case ServerInfoType::$RAM_PERCENT:
+              return json_decode(file_get_contents($link), true)['status']['ram']['percent'];
+            case ServerInfoType::$RAM_UNIT:
+              return json_decode(file_get_contents($link), true)['status']['units']['ram'];
+            case ServerInfoType::$RAM_USED:
+              return json_decode(file_get_contents($link), true)['status']['ram']['used'];
+            default:
+              die('<b>Fire-API Error : </b>Unknown server information type.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+              break;
+          }
+        case ServerName::$MUMBLE:
+          switch ($server_info_type) {
+            case ServerInfoType::$ONLINE:
+              return json_decode(file_get_contents($link), true)['status']['online'];
+            case ServerInfoType::$PLAYER_COUNT:
+              return json_decode(file_get_contents($link), true)['status']['players']['online'];
+          }
+        case ServerName::$MUMBLE_CVP:
+          switch ($server_info_type) {
+            case ServerInfoType::$CHANNELS:
+              return json_decode(file_get_contents($link), true)['root']['channels'];
+            case ServerInfoType::$MEMBERS_ONLINE:
+              return json_decode(file_get_contents($link), true)['users'];
+            case ServerInfoType::$MUMBLE_X_CONNECT_URL:
+              return json_decode(file_get_contents($link), true)['x_connecturl'];
+            case ServerInfoType::$SERVER_NAME:
+              return json_decode(file_get_contents($link), true)['name'];
+            case ServerInfoType::$UPTIME:
+              return json_decode(file_get_contents($link), true)['uptime'];
+          }
+        case ServerName::$DISCORD:
+          switch ($server_info_type) {
+            case ServerInfoType::$CHANNELS:
+              return json_decode(file_get_contents($link), true)['channels'];
+            case ServerInfoType::$DISCORD_ID:
+              return json_decode(file_get_contents($link), true)['id'];
+            case ServerInfoType::$MEMBERS:
+              return json_decode(file_get_contents($link), true)['members'];
+            case ServerInfoType::$SERVER_NAME:
+              return json_decode(file_get_contents($link), true)['name'];
+          }
+        case ServerName::$FRAMEWORK_STATUS:
+        case ServerName::$API_STATUS:
+          switch ($server_info_type) {
+            case ServerInfoType::$ONLINE:
+              return json_decode(file_get_contents($link), true)['informations']['online'];
+            case ServerInfoType::$VERSION:
+              return json_decode(file_get_contents($link), true)['informations']['version'];
+          }
+        default:
+          die('<b>Fire-API Error : </b>Unknown server name.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+          break;
+      }
+    }
+  }
+
+  // -------------------------------------------
+  //                  CONSTANTS
+  // -------------------------------------------
+  /**
+   * Constants used in math
+   *
+   * @category Constants
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class MathConstants {
+    /**
+     * Champernowne's constant
+     *
+     * @var float
      */
-    public function getClientBrowser() {
-      global $user_agent;
+    public static $CHAMPERNOWNE = 0.12345678910111;
+    /**
+     * Champernowne's constant
+     *
+     * @var float
+     */
+    public static $C10 = 0.12345678910111;
+    /**
+     * Gold number constant
+     *
+     * @var float
+     */
+    public static $GOLD_NUMBER = 1.61803398875;
+    /**
+     * Gold number constant
+     *
+     * @var float
+     */
+    public static $GOLD_SECTION = 1.61803398875;
+    /**
+     * Gold number constant
+     *
+     * @var float
+     */
+    public static $GOD_NUMBER = 1.61803398875;
+  }
+  /**
+   * Physics and chemical related constants
+   *
+   * @category Constants
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.0
+   */
+  class PhysChemConstants {
+    // Constants
+    /**
+     * Avogadro's constant (unit/mol)
+     *
+     * @var float
+     */
+    public static $AVOGADRO = 6.022140857 * 10 ** 23;
+    /**
+     * Boltzmann constant (J/K)
+     *
+     * @var float
+     */
+    public static $BOLTZMANN = 1.38066 * 10 ** (-23);
+    /**
+     * Boltzmann constant (J/K)
+     *
+     * @var float
+     */
+    public static $kB = 1.38066 * 10 ** (-23);
+    /**
+     * Light speed constant (m/s)
+     *
+     * @var float
+     */
+    public static $C = 2.99792458 * 10 ** 8;
+    /**
+     * Light speed constant (m/s)
+     *
+     * @var float
+     */
+    public static $LIGHT_SPEED = 2.99792458 * 10 ** 8;
+    /**
+     * Gravitational force on Earth (N/kg)
+     *
+     * @var float
+     */
+    public static $EARTH_GRAVITATIONAL_FORCE = 9.80665;
+    /**
+     * Elementary charge constant
+     *
+     * @var float
+     */
+    public static $ELEMENTARY_CHARGE = 1.60219 * 10 ** (-19);
+    /**
+     * Faraday's constant (C/mol)
+     *
+     * @var int
+     */
+    public static $FARADAY = 96484;
+    /**
+     * Gravitational constant (N × m² × kg-²)
+     *
+     * @var float
+     */
+    public static $G = 6.672 * 10 ** (-11);
+    /**
+     * Gravitational constant (N × m² × kg-²)
+     *
+     * @var float
+     */
+    public static $GRAVITATIONAL_CONSTANT = 6.672 * 10 ** (-11);
+    /**
+     * Perfect gasses constant (J/(K/mol))
+     *
+     * @var float
+     */
+    public static $PERFECT_GASSES = 8.3144;
+    /**
+     * Planck's constant (J × s)
+     *
+     * @var float
+     */
+    public static $PLANCK = 6.62617;
 
+    // Masses
+    /**
+     * Mass of an electron (kg)
+     */
+    public static $ELECTRON_MASS = 9.10953 * 10 ** (-31);
+    /**
+     * Mass of a neutron (kg)
+     */
+    public static $NEUTRON_MASS = 1.675 * 10 ** (-27);
+    /**
+     * Mass of a proton (kg)
+     */
+    public static $PROTON_MASS = 1.673 * 10 ** (-27);
+  }
+  /**
+   * Server-related constants
+   *
+   * @category Constants
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class Server {
+    /**
+     * Server #0 status file URL
+     */
+    public static $STATUS_0 = "https://panel.omgserv.com/json/256696/status";
+    /*
+     * Server #1 status file URL
+     */
+    public static $STATUS_1 = "https://panel.omgserv.com/json/180278/status";
+    /*
+     * Server #2 status file URL
+     */
+    public static $STATUS_2 = "https://panel.omgserv.com/json/239015/status";
+    /*
+     * Fire-API status file URL
+     */
+    public static $STATUS_API = "https://api.fire-softwares.ga/api.json";
+    /*
+     * Discord status file URL
+     */
+    public static $STATUS_DISCORD = "https://canary.discordapp.com/api/guilds/139106057522774016/widget.json";
+    /*
+     * Fire-API Web-Framework status file URL
+     */
+    public static $STATUS_FRAMEWORK = "https://api.fire-softwares.ga/framework.php";
+    /*
+     * Mumble Channel Viewer Protocol URL
+     */
+    public static $STATUS_MUMBLE_CVP =  "https://panel.omgserv.com/viewer/239015?cvp";
+  }
+
+  // -------------------------------------------
+  //                    UTILS
+  // -------------------------------------------
+  /**
+   * Some tools about Operating System and browser detection.
+   * Detection for client-side need user-agent of client that need to be
+   * specified as parameter of the function (can be obtained with
+   * $_SERVER['HTTP_USER_AGENT'])
+   *
+   * @category Utils
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.0
+   */
+  class OperatingSystem {
+    /**
+     * Detect client browser
+     *
+     * @param string $user_agent The user agent of client
+     * @return string Corresponding browser
+     */
+    public function getClientBrowser($user_agent) {
       $browser = "Not recognized browser";
-
       $browser_array = array(
                               '/msie/i'           => 'Internet Explorer',
                               '/firefox/i'        => 'Firefox',
@@ -819,22 +1126,19 @@
                               '/firebrowser/i'    => 'Fire-Browser',
                               '/xiaomi/i'         => 'Mi Browser'
                        );
-
       foreach ($browser_array as $regex => $value)
           if (preg_match($regex, $user_agent))
               $browser = $value;
-
       return $browser;
     }
-
     /**
-  	 * Detect client operating system.
+  	 * Detect client operating system
+     *
+     * @param string $user_agent The user agent of client
+     * @return string Corresponding Operating System
   	 */
-    public function getClientOS() {
-      global $user_agent;
-
+    public function getClientOS($user_agent) {
       $os_platform = "Not recognized operating system";
-
       $os_array = array('/windows nt 10/i'      =>  'Windows 10',
                         '/windows nt 6.3/i'     =>  'Windows 8.1',
                         '/windows nt 6.2/i'     =>  'Windows 8',
@@ -859,16 +1163,15 @@
                         '/blackberry/i'         =>  'BlackBerry',
                         '/webos/i'              =>  'Mobile'
                       );
-
       foreach ($os_array as $regex => $value)
         if (preg_match($regex, $user_agent))
           $os_platform = $value;
-
       return $os_platform;
     }
-
     /**
-   	 * Detect server operating system.
+   	 * Detect server operating system
+     *
+     * @return string Corresponding Operating System
    	 */
     public function getServerOS() {
       return php_uname('s');
