@@ -783,7 +783,7 @@
      * @param int $server_name Corresponding @see ServerName
      * @return string Status server URL
      */
-    private function getServerStatusURL($server_name) {
+    public function getServerStatusURL($server_name) {
       // Getting link for corresponding server name
       switch ($server_name) {
         case ServerName::$FIRE_SOFTWARES:
@@ -800,6 +800,9 @@
           return Server::$STATUS_FRAMEWORK;
         case ServerName::$API_STATUS:
           return Server::$STATUS_API;
+		default
+          throw new Exception("Unknown server name");
+          break;
       }
     }
 
