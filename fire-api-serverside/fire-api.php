@@ -800,7 +800,7 @@
           return Server::$STATUS_FRAMEWORK;
         case ServerName::$API_STATUS:
           return Server::$STATUS_API;
-		default
+		default:
           throw new Exception("Unknown server name");
           break;
       }
