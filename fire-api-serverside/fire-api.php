@@ -648,6 +648,10 @@
   class Messages {
     // Exceptions
     /**
+     * Message returned when slider captions and images arrays haven't same length
+     */
+    public static $SLIDER_CAPTIONS_AND_IMAGES_ARRAYS_NOT_SAME_LENGTH_EXCEPTION = "Captions and images arrays need to be same length.";
+    /**
      * Message returned when can't check for updates
      */
     public static $UPDATE_CHECK_EXCEPTION = "Can't check for updates :";
@@ -1178,6 +1182,355 @@
    	 */
     public function getServerOS() {
       return php_uname('s');
+    }
+  }
+  /**
+   * Component creation methods for Fire-API Web-Framework
+   * Fire-API Web-Framework need to be setup on the page
+   * See details on install at : https://api.fire-softwares.ga/?page=download
+   *
+   * NOTE : This class functions returns raw HTML to echo with PHP. To create
+   * components with JavaScript, refer to Web-Framework JavaScript function &
+   * methods.
+   *
+   * @category Utils
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class WebFrameworkComponentBuilder {
+    /* COLOR THEMES */
+    /**
+   	 * Format theme class and primary / secondary theme for ServerSide functions
+     *
+     * @param string $theme_class Theme class
+     * @param boolean $secondary Use secondary color scheme instead of primary (default = false)
+     * @return string Formatted theme class + (primary / secondary) for components
+   	 */
+    public static function formatColorSchemeClasses($theme_class, $secondary = false) {
+      return $theme_class . " " . ($secondary ? "secondary" : "primary");
+    }
+
+    /* ALERT BOXES */
+    /**
+   	 * Generates HTML code for an alert box
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $title Alert title
+     * @param string $message Alert message
+     * @param boolean $closable Set to true if alert is closable (default = true)
+     * @param boolean $animated Set to true if alert is animated (default = true)
+     * @param boolean $alert_close_animated Set to true if alert close button is animated (default = true)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param string $id Optional id (leave "" for no id)
+     * @return string Generated HTML code for alert box
+   	 */
+    public function alertBox($formatted_color_scheme_classes, $title, $message, $closable = true, $animated = true, $alert_close_animated = true, $style = "", $id = "") {
+      return '<div ' . ($id != "" ? 'id="' . $id . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' alert' . ($animated ? ' animated-alert' : '') . '">' . ($closable ? '<span class="alert-close' . ($alert_close_animated ? ' animated-alert-close' : '') . '>&times;</span>' : '') . '<span class="alert-title">' . $title . '</span>' . $message . '</div>';
+    }
+
+    /* BADGES */
+    /**
+   	 * Generates HTML code for a badge
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $content Badge content
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param string $id Optional id (leave "" for no id)
+     * @return string Generated HTML code for badge
+   	 */
+    public function badge($formatted_color_scheme_classes, $content, $style = "", $id = "") {
+      return '<span ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' badge">' . $content . '</span>';
+    }
+
+    /* BUTTONS AND DROPDOWNS */
+    /**
+   	 * Generates HTML code for a button
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $content Button content
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $url Optional URL (leave "" for no URL)
+     * @param boolean $open_in_new_tab Do the URL opens in a new tab (default = false)
+     * @return string Generated HTML code for button
+   	 */
+    public function button($formatted_color_scheme_classes, $content, $style = "", $id = "", $url = "", $open_in_new_tab = false) {
+      return '<button ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($url != "" ? 'onclick="' . ($open_in_new_tab ? 'window.open(\'' . $url . '\');' : 'window.location.href = \'' . $url . '\';') . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' button">' . $content . '</button>';
+    }
+    /**
+   	 * Generates HTML code for a dropdown
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $title_content Dropdown title
+     * @param string $content_id Dropdown content ID
+     * @param string $content Optional content string to wrap in dropdown div (leave "" for no wrapped content)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $arrow Set to true if you want to show an arrow at end of dropdown title content (default = true)
+     * @return string Generated HTML code for dropdown
+   	 */
+    public function dropdown($formatted_color_scheme_classes, $title_content, $content_id, $content = "", $style = "", $id = "", $arrow = true) {
+      return '<div class="dropdown" ' . ($id != "" ? 'id="' . $id . '"' : '') . '>' . button($formatted_color_scheme_classes, $title_content . ($arrow ? ' ▼' : ''), $style, ($id != "" ? $id . '-button" onclick="dropdown(\'' . $content_id . '\')"' : '" onclick="dropdown(\'' . $content_id . '\')"')) . $content . '</div>';
+    }
+
+    /* HYPERTEXT LINKS */
+    /**
+   	 * Generates HTML code for a hypertext link
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $content Hypertext content
+     * @param string $url Hypertext URL
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param boolean $newTab Set to true to open URL in a new tab (default = false)
+     * @param boolean $thin Set to true if you want to use thin hypertext version (default = false)
+     * @param string $id Optional id (leave "" for no id)
+     * @return string Generated HTML code for hypertext link
+   	 */
+    public function hypertext($formatted_color_scheme_classes, $content, $url = "", $style = "", $newTab = false, $thin = false, $id = "") {
+      return '<a ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($url != "" ? 'href="' . $url . '" ' : '') . ($newTab ? 'target="_blank" ' : '') . 'class="' . $formatted_color_scheme_classes . ' hypertext' . ($thin ? '-thin' : '') . '">' . $content . '</a>';
+    }
+
+    /* SLIDER */
+    /**
+   	 * Generates HTML code for a slider
+     * WARNING : you can create only one slider per page
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param array $images Array of image URLs
+     * @param array $captions Array of caption texts
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param boolean $animated Set to true if slider is animated (default = true)
+     * @param string $id Optional id (leave "" for no id)
+     * @return string Generated HTML code for slider
+   	 */
+    public function slider($formatted_color_scheme_classes, $images, $captions, $style = "", $animated = true, $id = "") {
+      if (count($images) === count($captions)) {
+        // Variables containing slider content and slider dots divs
+        $slider = '<div class="slider"' . ($id != "" ? ' id="' . $id . '-slider"' : '') . '>';
+        $sliderDots = '<div class="slider-dots">';
+
+        // Creating slider item for each images & captions
+        for ($i = 0; $i < count($images); $i++) $slider .= '<div class="slider-item' . ($animated ? ' slider-animated' : '')  . '"><img src="' . $images[$i] . '"/><div class="slider-caption">' . $captions[$i] . '</div></div>';
+
+        // Adding slider buttons
+        $slider .= '<a class="slider-previous' . ($animated ? ' slider-buttons-animated' : '') . '" onclick="plusSlides(-1)">&#10094;</a><a class="slider-next' . ($animated ? ' slider-buttons-animated' : '') . '" onclick="plusSlides(1)">&#10095;</a>';
+
+        // Creating slider dots for each slider
+        for ($i = 1; $i <= count($images); $i++) $sliderDots .= '<span class="slider-dot" onclick="currentSlide(' . $i . ')"></span>';
+
+        // Closing divs
+        $slider .= "</div><br/>"; // Adding line break
+        $sliderDots .= "</div>";
+
+        // Returning HTML code
+        return '<div ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' slider-container">' . $slider . $sliderDots . '</div>';
+      } else throw new Exception(Messages::$SLIDER_CAPTIONS_AND_IMAGES_ARRAYS_NOT_SAME_LENGTH_EXCEPTION);
+    }
+
+    /* INPUTS */
+    /**
+     * Generates HTML code for an input
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $input_type Type of input, types are : "text", "password", "date", "datetime-local", "email", "file", "month", "number", "search", "tel", "time", "url", "week"
+     * @param string $placeholder Input placeholder (leave "" for no placeholder)
+     * @param string $name Input name (leave "" for no name)
+     * @param string $value Input default value (leave "" for no default value)
+     * @param boolean $spellcheck Is spell check enabled on this field
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @return string Generated HTML code for corresponding input
+     */
+    public function input($formatted_color_scheme_classes, $input_type, $placeholder, $name, $value, $spellcheck = true, $id = "", $style = "") {
+      return '<input type="' . $input_type . '" ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($placeholder != "" ? 'placeholder="' . $placeholder . '" ' : '') . ($name != "" ? 'name="' . $name . '" ' : '') . ($value != "" ? 'value="' . $value . '" ' : '') . ($spellcheck ? 'spellcheck="true" ' : 'spellcheck="false" ') . 'class="' . $formatted_color_scheme_classes . ' ' . $input_type . '-input"' . . '></input>';
+    }
+    /**
+     * Generates HTML code for a radio input
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $text Input text
+     * @param string $name Input name
+     * @param boolean $checked Is input default checked (default = false)
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param boolean $radio Internal (leave default (= true) if you don't know)
+     * @return string Generated HTML code for radio input
+     */
+    public function radioInput($formatted_color_scheme_classes, $text, $name, $checked = false, $id = "", $style = "", $radio = true) {
+      // Defines if input is radio or checkbox
+      $radio_or_checkbox = ($radio ? 'radio' : 'checkbox');
+
+      return '<label ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' ' . $radio_or_checkbox . '-container">' . $text . '<input type="' . $radio_or_checkbox . '" name="' . $name . '"><span class="' . $radio_or_checkbox . '-input"></span></label>';
+    }
+    /**
+     * Generates HTML code for a checkbox input
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $text Input text
+     * @param string $name Input name
+     * @param boolean $checked Is input default checked (default = false)
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @return string Generated HTML code for checkbox input
+     */
+    public function checkBoxInput($formatted_color_scheme_classes, $text, $name, $checked = false, $id = "", $style = "") {
+      return radioInput($formatted_color_scheme_classes, $text, $name, $checked, $id, $style, false);
+    }
+
+    /* MODALS */
+    /**
+   	 * Generates HTML code for a modal box
+     *
+     * @param string $header_formatted_color_scheme_classes Theme class and primary / secondary theme for modal header (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $body_formatted_color_scheme_classes Theme class and primary / secondary theme for modal body (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $footer_formatted_color_scheme_classes Theme class and primary / secondary theme for modal footer (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $header_content Modal header content
+     * @param string $body_content Modal body content
+     * @param string $footer_content Modal footer content
+     * @param string $id Modal ID (needed)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param boolean $closable Is modal box closable (default = true)
+     * @param boolean $animated Set to true if modal box is animated (default = true)
+     * @param boolean $animated_close_button Set to true if modal box close button is animated (default = true)
+     * @return string Generated HTML code for modal box
+   	 */
+    public function modal($header_formatted_color_scheme_classes, $body_formatted_color_scheme_classes, $footer_formatted_color_scheme_classes, $header_content, $body_content, $footer_content, $id, $style = "", $closable = true, $animated = true, $animated_close_button = true) {
+      return '<div id="' . $id . '"' . ($style != "" ? ' style="' . $style . '"' : '')  . ' class="modal"><div class="modal-content' . ($animated ? ' animated-modal' : '') . '"><div class="' . $header_formatted_color_scheme_classes . ' modal-header"><span class="modal-close' . ($animated_close_button ? ' animated-modal-close' : '') . '" onclick="closeModal(\'' . $id . '\')">&times;</span>' . $header_content . '</div><div class="' . $body_formatted_color_scheme_classes . ' modal-body">' . $body_content . '</div><div class="' . $footer_formatted_color_scheme_classes . ' modal-footer">' . $footer_content . '</div></div></div>';
+    }
+
+    /* PROGRESS BARS */
+    /**
+   	 * Generates HTML code for a progress bar
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $background_formatted_color_scheme_classes Theme class and primary / secondary theme for background of the progress bar (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $id Progress ID (needed)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @param float $percentage Percentage in [0;1] that represents progress of progress bar (default = 0.0 (0 %))
+     * @return string Generated HTML code for progress bar
+   	 */
+    public function progressBar($formatted_color_scheme_classes, $background_formatted_color_scheme_classes, $id, $style = "", $percentage = .0) {
+      return '<div id="' . $id . '" ' . ($style != "" ? 'style="' . $style . '" ' : '')  . 'class="' . $background_formatted_color_scheme_classes . ' progress"><div class="' . $formatted_color_scheme_classes . ' progressbar" style="width: ' ($percentage * 100) '%;"></div></div>';
+    }
+
+    /* TOOLTIPS */
+    /**
+   	 * Generates specified HTML code wrapped in a tooltip element
+     *
+     * @param string $formatted_color_scheme_classes Theme class and primary / secondary theme (use @see formatColorSchemeClasses($theme_class, $secondary))
+     * @param string $htmlCode HTML code to wrap in a tooltip
+     * @param string $content Tooltip message content
+     * @param string $id Optional id (leave "" for no id)
+     * @param string $style Optional inline stylesheet (leave "" for no style)
+     * @return string Generated HTML code for progress bar
+   	 */
+    public function tooltip($formatted_color_scheme_classes, $htmlCode, $content, $id = "", $style = "") {
+      return '<div ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="tooltip">' . $htmlCode . '<span ' . ($id != "" ? 'id="' . $id . '-tooltip-content" ' : '') . 'class="' . $formatted_color_scheme_classes . ' tooltip-content">' . $content . '</span></div>';
+    }
+  }
+  /**
+   * Component interaction methods for Fire-API Web-Framework
+   * Fire-API Web-Framework need to be setup on the page
+   * See details on install at : https://api.fire-softwares.ga/?page=download
+   *
+   * NOTE : This class echoes JavaScript code, so need JavaScript to be
+   * installed and enabled to work client-side
+   *
+   * @category Utils
+   * @package None
+   * @author Renaud <renaud42@fire-softwares.ga>
+   * @copyright 2019 Fire-Softwares, www.fire-softwares.ga
+   * @license https://www.gnu.org/licenses/gpl-3.0.html
+   * @link https://api.fire-softwares.ga
+   * @version 1.1
+   * @since 1.1
+   */
+  class WebFrameworkComponentInteraction {
+    /* DROPDOWNS */
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to toggle a dropdown
+     *
+     * @param string $dropdownId Dropdown element ID
+     */
+    function toggleDropdown($dropdownId) {
+      echo "<script>dropdown('" . $dropdownId . "');</script>";
+    }
+
+    /* MODALS */
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to open a modal box
+     *
+     * @param string $modalId Modal element ID
+     */
+    function openModal($modalId) {
+      echo "<script>openModal('" . $modalId . "');</script>";
+    }
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to close a modal box
+     *
+     * @param string $modalId Modal element ID
+     */
+    function closeModal($modalId) {
+      echo "<script>closeModal('" . $modalId . "');</script>";
+    }
+
+    /* PROGRESS BARS */
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to get current progress value
+     * of a progress bar
+     *
+     * @param string $progressId Progress bar element ID
+     */
+    function echoProgressValue($progressId) {
+      echo "<script>getProgressValue('" . $progressId . "');</script>";
+    }
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to set current progress value
+     * of a progress bar
+     *
+     * @param string $progressId Progress bar element ID
+     * @param float $value Progress bar value as a percentage in [0;1]
+     */
+    function setProgressValue($progressId, $value) {
+      echo "<script>setProgressValue('" . $progressId . "', " . $value . ");</script>";
+    }
+
+    /* SLIDERS */
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to go to n next slides of
+     * slider
+     *
+     * @param integer $n n next slides
+     */
+    function plusSlides($n) {
+      echo "<script>plusSlides(" . $n . ");</script>";
+    }
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to go to a specific n slide
+     * of slider
+     *
+     * @param integer $n n slide
+     */
+    function currentSlide($n) {
+      echo "<script>currentSlide(" . $n . ");</script>";
+    }
+
+    /* DOM SYNTAXIC COLORATION */
+    /**
+   	 * Echo JavaScript wrapped inside <script> tag to add DOM syntaxic
+     * coloration to a code container element
+     *
+     * @param string $id Code container element ID
+     * @param boolean $autowidth Automatically resizes code container (default = true)
+     * @param string $mode Coloration mode (3 existing : "html", "css", "js") (default = "html")
+     */
+    function domSyntaxicColoration($id, $autowidth = true, $mode = "html") {
+      echo "<script>domSyntaxicColoration('" . $id . "', " . $autowidth . ", " . $mode . ");</script>";
     }
   }
 ?>
