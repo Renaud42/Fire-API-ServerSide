@@ -586,7 +586,7 @@
      * Current version of your API
      * @var string
      */
-    public static $API_VERSION = "1.1";
+    public $API_VERSION = "1.1";
     /**
      * Fire-API update page URL
      *
@@ -601,18 +601,18 @@
       $updater = new API;
 
       try {
-        if ($updater->getServerInformation(ServerName::$FIRE_SOFTWARES, ServerInfoType::$ONLINE) === TRUE) {
+        if ($updater->getServerInformation(ServerName::$FIRE_SOFTWARES, ServerInfoType::$ONLINE) === true) {
           $lastversion = $updater->getServerInformation(ServerName::$API_STATUS, ServerInfoType::$VERSION);
-          if (doubleval($lastversion) > doubleval($API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $API_UPDATE_PAGE, str_replace("%new-version%", $lastversion, Messages::$API_UPDATE_AVAILABLE)), 'warn');
-          elseif (doubleval($lastversion) < doubleval($API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $API_UPDATE_PAGE, str_replace("%lastest-stable%", $lastversion, str_replace("%api-version%", $API_VERSION, Messages::$API_BETA))), 'warn');
-          else $this->console_log(Messages::$API_PREFIX . " " . str_replace("%api-version%", $API_VERSION, Messages::$API_UP_TO_DATE));
+          if (doubleval($lastversion) > doubleval($this->API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $this->API_UPDATE_PAGE, str_replace("%new-version%", $lastversion, Messages::$API_UPDATE_AVAILABLE)), 'warn');
+          elseif (doubleval($lastversion) < doubleval($this->API_VERSION)) $this->console_log(Messages::$API_WARNING_PREFIX . " " . str_replace("%api-update-page%", $this->API_UPDATE_PAGE, str_replace("%lastest-stable%", $lastversion, str_replace("%api-version%", $this->API_VERSION, Messages::$API_BETA))), 'warn');
+          else $this->console_log(Messages::$API_PREFIX . " " . str_replace("%api-version%", $this->API_VERSION, Messages::$API_UP_TO_DATE));
         }
       } catch (Exception $e) {
         $this->console_log(Messages::$API_ERROR_PREFIX . " " . Messages::$UPDATE_CHECK_EXCEPTION, 'error');
         $this->console_log(Messages::$API_ERROR_PREFIX . " " . $e->getMessage(), 'error');
       }
 
-      $this->console_log("\n\r" . Messages::$API_PREFIX . " " . str_replace("%api-version%", $API_VERSION, Messages::$API_HELLO));
+      $this->console_log("\n\r" . Messages::$API_PREFIX . " " . str_replace("%api-version%", $this->API_VERSION, Messages::$API_HELLO));
     }
 
     // Constructor
@@ -662,19 +662,19 @@
      *
      * @var string
      */
-    public static $API_PREFIX = "[Fire-API]";
+    public static $API_PREFIX = "[Fire-API Server-Side]";
     /**
      * Fire-API logs error prefix
      *
      * @var string
      */
-    public static $API_ERROR_PREFIX = "[Fire-API Error]";
+    public static $API_ERROR_PREFIX = "[Fire-API Server-Side Error]";
     /**
      * Fire-API logs warning prefix
      *
      * @var string
      */
-    public static $API_WARNING_PREFIX = "[Fire-API Warning]";
+    public static $API_WARNING_PREFIX = "[Fire-API Server-Side Warning]";
 
     // Success
     /**
@@ -682,13 +682,13 @@
      *
      * @var string
      */
-    public static $API_HELLO = "Fire-API version %api-version% by Fire-Softwares successfully loaded !";
+    public static $API_HELLO = "Fire-API Server-Side version %api-version% by Fire-Softwares successfully loaded !";
     /**
      * Message shown when your Fire-API version is the lastest stable
      *
      * @var string
      */
-    public static $API_UP_TO_DATE = "You're running the lastest version of Fire-API (%api-version%), nice !";
+    public static $API_UP_TO_DATE = "You're running the lastest version of Fire-API Server-Side (%api-version%), nice !";
 
     // Warnings
     /**
@@ -696,13 +696,13 @@
      *
      * @var string
      */
-    public static $API_BETA = "Warning : you are using a beta / unstable build of Fire-API (%api-version%). If you don't know why you see this warning, go back to lastest stable version (%lastest-stable%) on %api-update-page%. Or else you're in the future of Fire-API 8)";
+    public static $API_BETA = "Warning : you are using a beta / unstable build of Fire-API Server-Side (%api-version%). If you don't know why you see this warning, go back to lastest stable version (%lastest-stable%) on %api-update-page%. Or else you're in the future of Fire-API 8)";
     /**
      * Message shown when a Fire-API update is available
      *
      * @var string
      */
-    public static $API_UPDATE_AVAILABLE = "New update available : Fire-API version %new-version%. You can get the update here : %api-update-page%";
+    public static $API_UPDATE_AVAILABLE = "New update available : Fire-API Server-Side version %new-version%. You can get the update here : %api-update-page%";
   }
 
   // -------------------------------------------
@@ -1230,7 +1230,8 @@
      * @return string Generated HTML code for alert box
    	 */
     public function alertBox($formatted_color_scheme_classes, $title, $message, $closable = true, $animated = true, $alert_close_animated = true, $style = "", $id = "") {
-      return '<div ' . ($id != "" ? 'id="' . $id . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' alert' . ($animated ? ' animated-alert' : '') . '">' . ($closable ? '<span class="alert-close' . ($alert_close_animated ? ' animated-alert-close' : '') . '>&times;</span>' : '') . '<span class="alert-title">' . $title . '</span>' . $message . '</div>';
+      return '<div ' . ($id != "" ? 'id="' . $id . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' alert' . ($animated ? ' animated-alert' : '') . '">' . ($closable ? '<span class="alert-close' . ($alert_close_animated ? ' animated-alert-close' : '') . '">&times;</span>' : '') . '<span class="alert-title">' . $title . '</span>
+' . $message . '</div>';
     }
 
     /* BADGES */
@@ -1257,10 +1258,11 @@
      * @param string $id Optional id (leave "" for no id)
      * @param string $url Optional URL (leave "" for no URL)
      * @param boolean $open_in_new_tab Do the URL opens in a new tab (default = false)
+     * @param boolean $dropdown_button Is this button a dropdown (default = false, leave default if you don't know what is this)
      * @return string Generated HTML code for button
    	 */
-    public function button($formatted_color_scheme_classes, $content, $style = "", $id = "", $url = "", $open_in_new_tab = false) {
-      return '<button ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($url != "" ? 'onclick="' . ($open_in_new_tab ? 'window.open(\'' . $url . '\');' : 'window.location.href = \'' . $url . '\';') . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' button">' . $content . '</button>';
+    public function button($formatted_color_scheme_classes, $content, $style = "", $id = "", $url = "", $open_in_new_tab = false, $dropdown_button = false) {
+      return '<button ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($url != "" ? 'onclick="' . ($open_in_new_tab ? 'window.open(\'' . $url . '\');' : 'window.location.href = \'' . $url . '\';') . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' button' . ($dropdown_button ? ' dropdown-button': '') . '">' . $content . '</button>';
     }
     /**
    	 * Generates HTML code for a dropdown
@@ -1275,7 +1277,7 @@
      * @return string Generated HTML code for dropdown
    	 */
     public function dropdown($formatted_color_scheme_classes, $title_content, $content_id, $content = "", $style = "", $id = "", $arrow = true) {
-      return '<div class="dropdown" ' . ($id != "" ? 'id="' . $id . '"' : '') . '>' . button($formatted_color_scheme_classes, $title_content . ($arrow ? ' ▼' : ''), $style, ($id != "" ? $id . '-button" onclick="dropdown(\'' . $content_id . '\')"' : '" onclick="dropdown(\'' . $content_id . '\')"')) . $content . '</div>';
+      return '<div class="dropdown" ' . ($id != "" ? 'id="' . $id . '"' : '') . '>' . $this->button($formatted_color_scheme_classes, $title_content . ($arrow ? ' ▼' : ''), $style, ($id != "" ? $id . '-button" onclick="dropdown(\'' . $content_id . '\')' : '" onclick="dropdown(\'' . $content_id . '\')'), "", false, true) . $content . '</div>';
     }
 
     /* HYPERTEXT LINKS */
@@ -1347,7 +1349,7 @@
      * @return string Generated HTML code for corresponding input
      */
     public function input($formatted_color_scheme_classes, $input_type, $placeholder, $name, $value, $spellcheck = true, $id = "", $style = "") {
-      return '<input type="' . $input_type . '" ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($placeholder != "" ? 'placeholder="' . $placeholder . '" ' : '') . ($name != "" ? 'name="' . $name . '" ' : '') . ($value != "" ? 'value="' . $value . '" ' : '') . ($spellcheck ? 'spellcheck="true" ' : 'spellcheck="false" ') . 'class="' . $formatted_color_scheme_classes . ' ' . $input_type . '-input"' . . '></input>';
+      return '<input type="' . $input_type . '" ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . ($placeholder != "" ? 'placeholder="' . $placeholder . '" ' : '') . ($name != "" ? 'name="' . $name . '" ' : '') . ($value != "" ? 'value="' . $value . '" ' : '') . ($spellcheck ? 'spellcheck="true" ' : 'spellcheck="false" ') . 'class="' . $formatted_color_scheme_classes . ' ' . $input_type . '-input"' . '></input>';
     }
     /**
      * Generates HTML code for a radio input
@@ -1365,7 +1367,7 @@
       // Defines if input is radio or checkbox
       $radio_or_checkbox = ($radio ? 'radio' : 'checkbox');
 
-      return '<label ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' ' . $radio_or_checkbox . '-container">' . $text . '<input type="' . $radio_or_checkbox . '" name="' . $name . '"><span class="' . $radio_or_checkbox . '-input"></span></label>';
+      return '<label ' . ($id != "" ? 'id="' . $id . '" ' : '') . ($style != "" ? 'style="' . $style . '" ' : '') . 'class="' . $formatted_color_scheme_classes . ' ' . $radio_or_checkbox . '-container">' . $text . '<input type="' . $radio_or_checkbox . '" name="' . $name . '"' . ($checked ? ' checked="checked"' : '') . '><span class="' . $radio_or_checkbox . '-input"></span></label>';
     }
     /**
      * Generates HTML code for a checkbox input
@@ -1379,7 +1381,7 @@
      * @return string Generated HTML code for checkbox input
      */
     public function checkBoxInput($formatted_color_scheme_classes, $text, $name, $checked = false, $id = "", $style = "") {
-      return radioInput($formatted_color_scheme_classes, $text, $name, $checked, $id, $style, false);
+      return $this->radioInput($formatted_color_scheme_classes, $text, $name, $checked, $id, $style, false);
     }
 
     /* MODALS */
@@ -1415,7 +1417,7 @@
      * @return string Generated HTML code for progress bar
    	 */
     public function progressBar($formatted_color_scheme_classes, $background_formatted_color_scheme_classes, $id, $style = "", $percentage = .0) {
-      return '<div id="' . $id . '" ' . ($style != "" ? 'style="' . $style . '" ' : '')  . 'class="' . $background_formatted_color_scheme_classes . ' progress"><div class="' . $formatted_color_scheme_classes . ' progressbar" style="width: ' ($percentage * 100) '%;"></div></div>';
+      return '<div id="' . $id . '" class="' . $background_formatted_color_scheme_classes . ' progress"><div class="' . $formatted_color_scheme_classes . ' progressbar" style="width: ' . ($percentage * 100) . '%; ' . $style . '"></div></div>';
     }
 
     /* TOOLTIPS */
