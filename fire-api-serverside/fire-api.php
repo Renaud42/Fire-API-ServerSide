@@ -861,6 +861,9 @@
               return json_decode(file_get_contents($link), true)['status']['online'];
             case ServerInfoType::$PLAYER_COUNT:
               return json_decode(file_get_contents($link), true)['status']['players']['online'];
+            default:
+              die('<b>Fire-API Error : </b>Unknown server information type.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+              break;
           }
         case ServerName::$MUMBLE_CVP:
           switch ($server_info_type) {
@@ -874,6 +877,9 @@
               return json_decode(file_get_contents($link), true)['name'];
             case ServerInfoType::$UPTIME:
               return json_decode(file_get_contents($link), true)['uptime'];
+            default:
+              die('<b>Fire-API Error : </b>Unknown server information type.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+              break;
           }
         case ServerName::$DISCORD:
           switch ($server_info_type) {
@@ -885,6 +891,9 @@
               return json_decode(file_get_contents($link), true)['members'];
             case ServerInfoType::$SERVER_NAME:
               return json_decode(file_get_contents($link), true)['name'];
+            default:
+              die('<b>Fire-API Error : </b>Unknown server information type.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+              break;
           }
         case ServerName::$FRAMEWORK_STATUS:
         case ServerName::$API_STATUS:
@@ -893,6 +902,9 @@
               return json_decode(file_get_contents($link), true)['informations']['online'];
             case ServerInfoType::$VERSION:
               return json_decode(file_get_contents($link), true)['informations']['version'];
+            default:
+              die('<b>Fire-API Error : </b>Unknown server information type.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
+              break;
           }
         default:
           die('<b>Fire-API Error : </b>Unknown server name.<br>See <a href="https://api.fire-softwares.ga/" target="_blank">Fire-API documentation</a> for more help.');
